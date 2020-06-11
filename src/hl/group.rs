@@ -4,7 +4,7 @@ use std::panic;
 
 use hdf5_sys::{
     h5::{hsize_t, H5_index_t, H5_iter_order_t},
-    h5a::H5Aopen,
+    h5a::{H5Aexists, H5Aopen},
     h5d::H5Dopen2,
     h5g::{H5G_info_t, H5Gcreate2, H5Gget_info, H5Gopen2},
     h5l::{
@@ -180,7 +180,13 @@ impl Group {
 
     pub fn attribute(&self, name: &str) -> Result<Attribute> {
         let name = to_cstring(name)?;
-        Attribute::from_id(h5try!(H5Aopen(self.id(), name.as_ptr(), H5P_DEFAULT)))
+        h5call!(H5Aexists(self.id(), name.as_ptr())).and_then(|r|
+            if r > 0 {
+                Attribute::from_id(h5try!(H5Aopen(self.id(), name.as_ptr(), H5P_DEFAULT)))
+            } else {
+                Err(Error::Internal("The attribute could not be found.".into()))
+            }
+        )
     }
 
     /// Returns names of all the members in the group, non-recursively.
