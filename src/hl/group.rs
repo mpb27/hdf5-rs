@@ -184,7 +184,8 @@ impl Group {
             if r > 0 {
                 Attribute::from_id(h5try!(H5Aopen(self.id(), name.as_ptr(), H5P_DEFAULT)))
             } else {
-                Err(Error::Internal("The attribute could not be found.".into()))
+                let msg = format!("Attribute doesn't exist: {:?}", name);
+                Err(Error::Internal(msg.into()))
             }
         )
     }
