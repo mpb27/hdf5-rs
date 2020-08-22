@@ -180,14 +180,14 @@ impl Group {
 
     pub fn attribute(&self, name: &str) -> Result<Attribute> {
         let name = to_cstring(name)?;
-        h5call!(H5Aexists(self.id(), name.as_ptr())).and_then(|r|
+        h5call!(H5Aexists(self.id(), name.as_ptr())).and_then(|r| {
             if r > 0 {
                 Attribute::from_id(h5try!(H5Aopen(self.id(), name.as_ptr(), H5P_DEFAULT)))
             } else {
                 let msg = format!("Attribute doesn't exist: {:?}", name);
                 Err(Error::Internal(msg.into()))
             }
-        )
+        })
     }
 
     /// Returns names of all the members in the group, non-recursively.

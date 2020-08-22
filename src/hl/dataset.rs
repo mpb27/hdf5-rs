@@ -232,14 +232,14 @@ impl Dataset {
 
     pub fn attribute(&self, name: &str) -> Result<Attribute> {
         let name = to_cstring(name)?;
-        h5call!(H5Aexists(self.id(), name.as_ptr())).and_then(|r|
+        h5call!(H5Aexists(self.id(), name.as_ptr())).and_then(|r| {
             if r > 0 {
                 Attribute::from_id(h5try!(H5Aopen(self.id(), name.as_ptr(), H5P_DEFAULT)))
             } else {
                 let msg = format!("Attribute doesn't exist: {:?}", name);
                 Err(Error::Internal(msg.into()))
             }
-        )
+        })
     }
 
     pub fn attribute_names(&self) -> Result<Vec<String>> {

@@ -167,8 +167,8 @@ impl<T: H5Type> AttributeBuilder<T> {
 pub mod attribute_tests {
     use crate::internal_prelude::*;
     use ndarray::{arr2, Array2};
-    use types::VarLenUnicode;
     use std::str::FromStr;
+    use types::VarLenUnicode;
 
     #[test]
     pub fn test_shape_ndim_size() {
