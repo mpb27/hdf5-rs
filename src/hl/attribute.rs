@@ -257,6 +257,16 @@ pub mod attribute_tests {
     }
 
     #[test]
+    pub fn test_missing() {
+        with_tmp_file(|file| {
+            let _ = file.new_attribute::<u32>().create("foo", (1, 2)).unwrap();
+
+            let missing_result = file.attribute("bar");
+            assert!(missing_result.is_err());
+        })
+    }
+
+    #[test]
     pub fn test_write_read_str() {
         with_tmp_file(|file| {
             let s = VarLenUnicode::from_str("var len foo").unwrap();
