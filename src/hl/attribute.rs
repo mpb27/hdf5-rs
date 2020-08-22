@@ -254,17 +254,25 @@ pub mod attribute_tests {
             assert_eq!(file.attribute("foo").unwrap().shape(), vec![1, 2]);
         })
     }
+
     #[test]
     pub fn test_write_read_str() {
         with_tmp_file(|file| {
             let s = VarLenUnicode::from_str("var len foo").unwrap();
 
+            println!("file.new_attribute");
             let attr = file.new_attribute::<VarLenUnicode>().create("foo", ()).unwrap();
+
+            println!("write attribute");
             attr.as_writer().write_scalar(&s).unwrap();
 
+            println!("get attribute");
             let read_attr = file.attribute("foo").unwrap();
+
+            println!("attribute shape");
             assert_eq!(read_attr.shape(), []);
 
+            println!("read attribute");
             let r: VarLenUnicode = read_attr.as_reader().read_scalar().unwrap();
 
             assert_eq!(r, s);
