@@ -237,7 +237,7 @@ impl Dataset {
                 Attribute::from_id(h5try!(H5Aopen(self.id(), name.as_ptr(), H5P_DEFAULT)))
             } else {
                 let msg = format!("Attribute doesn't exist: {:?}", name);
-                Err(Error::Internal(msg.into()))
+                Err(Error::Internal(msg))
             }
         })
     }
