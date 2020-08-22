@@ -109,7 +109,7 @@ jobs:
           [ "${{runner.os}}" != "Windows" ] && export RUSTFLAGS="-C link-args=-Wl,-rpath,$CONDA_PREFIX/lib"
           [ "${{matrix.mpi}}" == "mpich" ] && [ "${{runner.os}}" == "Linux" ] && export MPICH_CC=$(which gcc)
           [ "${{matrix.mpi}}" == "openmpi" ] && [ "${{runner.os}}" == "Linux" ] && export OMPI_CC=$(which gcc)
-          cargo test -vv --features="$FEATURES"
+          cargo test -vv --features="$FEATURES" --test-threads 1 attribute_tests -- --nocapture
 
   static:
     name: static
