@@ -1,8 +1,9 @@
 use std::fmt::{self, Debug};
+use std::marker::PhantomData;
 use std::ops::Deref;
 
 use hdf5_sys::{
-    h5::{hsize_t, H5_index_t, H5_iter_order_t},
+    h5::{H5_index_t, H5_iter_order_t},
     h5a::{H5A_info_t, H5A_operator2_t, H5Acreate2, H5Aiterate2},
 };
 
@@ -48,11 +49,11 @@ impl Attribute {
         extern "C" fn attributes_callback(
             _id: hid_t, attr_name: *const c_char, _info: *const H5A_info_t, op_data: *mut c_void,
         ) -> herr_t {
-            let other_data: &mut Vec<String> = unsafe { &mut *(op_data as *mut Vec<String>) };
-
-            other_data.push(string_from_cstr(attr_name));
-
-            0 // Continue iteration
+            std::panic::catch_unwind(|| {
+                let other_data: &mut Vec<String> = unsafe { &mut *(op_data as *mut Vec<String>) };
+                other_data.push(string_from_cstr(attr_name));
+                0 // Continue iteration
+            }).unwrap_or(-1)
         }
 
         let callback_fn: H5A_operator2_t = Some(attributes_callback);
@@ -79,7 +80,7 @@ pub struct AttributeBuilder<T> {
     filters: Filters,
     parent: Result<Handle>,
     track_times: bool,
-    phantom: std::marker::PhantomData<T>,
+    phantom: PhantomData<T>,
 }
 
 impl<T: H5Type> AttributeBuilder<T> {
@@ -97,7 +98,7 @@ impl<T: H5Type> AttributeBuilder<T> {
                 filters: Filters::default(),
                 parent: handle,
                 track_times: false,
-                phantom: std::marker::PhantomData,
+                phantom: PhantomData,
             }
         })
     }
