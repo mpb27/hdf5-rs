@@ -290,6 +290,7 @@ pub mod attribute_tests {
             let r: VarLenUnicode = read_attr.as_reader().read_scalar().unwrap();
 
             assert_eq!(r, s);
+            std::mem::forget(r);
         })
     }
 }
