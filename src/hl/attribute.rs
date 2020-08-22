@@ -53,7 +53,8 @@ impl Attribute {
                 let other_data: &mut Vec<String> = unsafe { &mut *(op_data as *mut Vec<String>) };
                 other_data.push(string_from_cstr(attr_name));
                 0 // Continue iteration
-            }).unwrap_or(-1)
+            })
+            .unwrap_or(-1)
         }
 
         let callback_fn: H5A_operator2_t = Some(attributes_callback);
@@ -149,7 +150,7 @@ impl<T: H5Type> AttributeBuilder<T> {
 
             let name = to_cstring(name)?;
             println!("making attr...");
-            println!("making attr..."); 
+            println!("making attr...");
             Attribute::from_id(h5try!(H5Acreate2(
                 parent.id(),
                 name.as_ptr(),
