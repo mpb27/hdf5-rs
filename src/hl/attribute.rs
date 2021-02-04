@@ -58,7 +58,7 @@ impl Attribute {
         }
 
         let callback_fn: H5A_operator2_t = Some(attributes_callback);
-        let iteration_position: *mut hsize_t = &mut { 0 as u64 };
+        let iteration_position: *mut hsize_t = &mut { 0_u64 };
         let mut result: Vec<String> = Vec::new();
         let other_data: *mut c_void = &mut result as *mut _ as *mut c_void;
 
@@ -291,7 +291,6 @@ pub mod attribute_tests {
             let r: VarLenUnicode = read_attr.as_reader().read_scalar().unwrap();
 
             assert_eq!(r, s);
-            std::mem::forget(r);
         })
     }
 }
