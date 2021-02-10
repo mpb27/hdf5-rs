@@ -184,7 +184,7 @@ impl_string_traits!(VarLenUnicode, VarLenUnicode);
 
 // use HDF5 malloc/free for variable length objects on Windows
 // with a sufficient HDF5 version
-#[cfg(all(windows, hdf5_1_8_15))]
+#[cfg(windows)]
 mod alloc {
     use hdf5_sys::h5::herr_t;
     use libc::{c_void, size_t};
@@ -209,13 +209,10 @@ mod alloc {
     }
 
     pub unsafe fn free(mem: *mut c_void) -> herr_t {
-        hdf5_sys::h5::H5free_memory(mem)
+        libc::free(mem);
+        0
     }
 }
-
-// We don't support windows on old versions of HDF5
-#[cfg(all(windows, not(hdf5_1_8_15)))]
-compile_error!("Windows support requires hdf5 >= 1.8.15");
 
 #[repr(C)]
 pub struct VarLenAscii {

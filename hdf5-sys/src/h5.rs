@@ -81,6 +81,13 @@ extern "C" {
     pub fn H5resize_memory(mem: *mut c_void, size: size_t) -> *mut c_void;
 }
 
+// We don't support windows on old versions of HDF5.
+// This configuration may cause crashes or memory corruption due
+// to allocator mismatches when using attributes.
+// Fail to compile to encourage users to use a newer version of HDF5.
+#[cfg(all(windows, not(hdf5_1_8_15)))]
+compile_error!("Windows support requires hdf5 >= 1.8.15");
+
 #[cfg(hdf5_1_8_16)]
 extern "C" {
     pub fn H5is_library_threadsafe(is_ts: *mut hbool_t) -> herr_t;
