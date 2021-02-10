@@ -190,7 +190,7 @@ mod alloc {
     use libc::{c_void, size_t};
 
     pub unsafe fn malloc(size: size_t) -> *mut c_void {
-        hdf5_sys::h5::H5allocate_memory(size, false)
+        hdf5_sys::h5::H5allocate_memory(size, 0)
     }
 
     pub unsafe fn free(mem: *mut c_void) -> herr_t {
