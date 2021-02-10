@@ -182,6 +182,41 @@ impl_string_traits!(VarLenUnicode, VarLenUnicode);
 
 // ================================================================================
 
+// use HDF5 malloc/free for variable length objects on Windows
+// with a sufficient HDF5 version
+#[cfg(all(windows, hdf5_1_8_15))]
+mod alloc {
+    use hdf5_sys::h5::herr_t;
+    use libc::{c_void, size_t};
+
+    pub unsafe fn malloc(size: size_t) -> *mut c_void {
+        hdf5_sys::h5::H5allocate_memory(size, false)
+    }
+
+    pub unsafe fn free(mem: *mut c_void) -> herr_t {
+        hdf5_sys::h5::H5free_memory(mem)
+    }
+}
+
+// use libc for variable length objects outside of windows
+#[cfg(not(windows))]
+mod alloc {
+    use hdf5_sys::h5::herr_t;
+    use libc::{c_void, size_t};
+
+    pub unsafe fn malloc(size: size_t) -> *mut c_void {
+        libc::malloc(size)
+    }
+
+    pub unsafe fn free(mem: *mut c_void) -> herr_t {
+        hdf5_sys::h5::H5free_memory(mem)
+    }
+}
+
+// We don't support windows on old versions of HDF5
+#[cfg(all(windows, not(hdf5_1_8_15)))]
+compile_error!("Windows support requires hdf5 >= 1.8.15");
+
 #[repr(C)]
 pub struct VarLenAscii {
     ptr: *mut u8,
@@ -191,7 +226,7 @@ impl Drop for VarLenAscii {
     #[inline]
     fn drop(&mut self) {
         if !self.ptr.is_null() {
-            unsafe { libc::free(self.ptr as *mut _) };
+            unsafe { alloc::free(self.ptr as *mut _) };
         }
     }
 }
@@ -207,7 +242,7 @@ impl VarLenAscii {
     #[inline]
     pub fn new() -> Self {
         unsafe {
-            let ptr = libc::malloc(1) as *mut _;
+            let ptr = alloc::malloc(1) as *mut _;
             *ptr = 0;
             VarLenAscii { ptr }
         }
@@ -215,7 +250,7 @@ impl VarLenAscii {
 
     #[inline]
     unsafe fn from_bytes(bytes: &[u8]) -> Self {
-        let ptr = libc::malloc(bytes.len() + 1) as *mut _;
+        let ptr = alloc::malloc(bytes.len() + 1) as *mut _;
         ptr::copy_nonoverlapping(bytes.as_ptr(), ptr, bytes.len());
         *ptr.add(bytes.len()) = 0;
         VarLenAscii { ptr }
@@ -294,7 +329,7 @@ impl Drop for VarLenUnicode {
     #[inline]
     fn drop(&mut self) {
         if !self.ptr.is_null() {
-            unsafe { libc::free(self.ptr as *mut _) };
+            unsafe { alloc::free(self.ptr as *mut _) };
         }
     }
 }
@@ -310,7 +345,7 @@ impl VarLenUnicode {
     #[inline]
     pub fn new() -> Self {
         unsafe {
-            let ptr = libc::malloc(1) as *mut _;
+            let ptr = alloc::malloc(1) as *mut _;
             *ptr = 0;
             VarLenUnicode { ptr }
         }
@@ -318,7 +353,7 @@ impl VarLenUnicode {
 
     #[inline]
     unsafe fn from_bytes(bytes: &[u8]) -> Self {
-        let ptr = libc::malloc(bytes.len() + 1) as *mut _;
+        let ptr = alloc::malloc(bytes.len() + 1) as *mut _;
         ptr::copy_nonoverlapping(bytes.as_ptr(), ptr, bytes.len());
         *ptr.add(bytes.len()) = 0;
         VarLenUnicode { ptr }
