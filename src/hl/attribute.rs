@@ -135,7 +135,6 @@ impl<T: H5Type> AttributeBuilder<T> {
     }
 
     fn finalize<D: Dimension>(&self, name: &str, dims: D) -> Result<Attribute> {
-        println!("getting type_descriptor");
         let type_descriptor = if self.packed {
             <T as H5Type>::type_descriptor().to_packed_repr()
         } else {
@@ -149,8 +148,6 @@ impl<T: H5Type> AttributeBuilder<T> {
             let dataspace = Dataspace::try_new(dims, false)?;
 
             let name = to_cstring(name)?;
-            println!("making attr...");
-            println!("making attr...");
             Attribute::from_id(h5try!(H5Acreate2(
                 parent.id(),
                 name.as_ptr(),
