@@ -15,7 +15,8 @@ use hdf5_types::{
     CompoundField, CompoundType, EnumMember, EnumType, FloatSize, H5Type, IntSize, TypeDescriptor,
 };
 
-use crate::globals::{H5T_C_S1, H5T_NATIVE_INT, H5T_NATIVE_INT8};
+#[allow(unused_imports)]
+use crate::globals::{H5T_C_S1, H5T_NATIVE_INT, H5T_NATIVE_INT8, H5T_STD_REF_OBJ, H5T_STD_REF_DSETREG};
 use crate::internal_prelude::*;
 
 #[cfg(target_endian = "big")]
@@ -392,6 +393,7 @@ impl Datatype {
                 }
                 TD::VarLenAscii => string_type(None, H5T_cset_t::H5T_CSET_ASCII),
                 TD::VarLenUnicode => string_type(None, H5T_cset_t::H5T_CSET_UTF8),
+                TD::Reference => Ok(h5try!(H5Tcopy(*H5T_STD_REF_DSETREG))),
             }
         });
 

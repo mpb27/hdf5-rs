@@ -31,6 +31,7 @@ mod export {
         hl::{
             Attribute, AttributeBuilder, Container, Conversion, Dataset, DatasetBuilder, Dataspace,
             Datatype, File, FileBuilder, Group, Location, Object, PropertyList, Reader, Writer,
+            Reference
         },
     };
 

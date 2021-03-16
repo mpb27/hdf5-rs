@@ -7,6 +7,7 @@ pub mod group;
 pub mod location;
 pub mod object;
 pub mod plist;
+pub mod reference;
 pub mod space;
 
 pub use self::{
@@ -19,5 +20,6 @@ pub use self::{
     location::Location,
     object::Object,
     plist::PropertyList,
+    reference::Reference,
     space::Dataspace,
 };

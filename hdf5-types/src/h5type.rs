@@ -153,6 +153,7 @@ pub enum TypeDescriptor {
     VarLenArray(Box<TypeDescriptor>),
     VarLenAscii,
     VarLenUnicode,
+    Reference,
 }
 
 impl Display for TypeDescriptor {
@@ -177,6 +178,7 @@ impl Display for TypeDescriptor {
             TypeDescriptor::VarLenArray(ref tp) => write!(f, "[{}] (var len)", tp),
             TypeDescriptor::VarLenAscii => write!(f, "string (var len)"),
             TypeDescriptor::VarLenUnicode => write!(f, "unicode (var len)"),
+            TypeDescriptor::Reference => write!(f, "reference"),
         }
     }
 }
@@ -195,6 +197,7 @@ impl TypeDescriptor {
             FixedAscii(len) | FixedUnicode(len) => len,
             VarLenArray(_) => mem::size_of::<hvl_t>(),
             VarLenAscii | VarLenUnicode => mem::size_of::<*const u8>(),
+            Reference => 12, // FIXME!!!!
         }
     }
 
